@@ -19,7 +19,7 @@ public class Customers {
         Map<String, Customer> resMap = new HashMap<>();
         for (AbsCustomer cust : rawVer.getAbsCustomer()
         ) {
-            Customer toAdd = Customer.ConvertRawAbsToCustomer(cust);
+            Customer toAdd = Customer.convertRawAbsToCustomer(cust);
             if (resMap.containsKey(toAdd.getName())) {
                 throw new AbsException("We can't have two customers with same name");
             } else {
@@ -27,6 +27,31 @@ public class Customers {
             }
         }
         Customers res = new Customers(resMap);
+        return res;
+    }
+
+    public Map<String, Customer> getAllCustomers() {
+        return allCustomers;
+    }
+
+    @Override
+    public String toString() {
+        String res = "Customers in the system:\n";
+        int i = 1;
+        for (Customer cust : this.getAllCustomers().values()
+        ) {
+            res+= cust;
+        }
+        return res;
+    }
+
+    public String showAllCustomersNameByOrder(){
+        String res = "Customers in the system:\n";
+        int i = 1;
+        for (Customer cust : this.getAllCustomers().values()
+        ) {
+            res+= cust.getName()+"\n";
+        }
         return res;
     }
 }
