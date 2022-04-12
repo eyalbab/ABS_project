@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Loans {
-    private Map<String, Loan> allLoans = null;
+    private Map<String, Loan> allLoans;
 
     private Loans(Map<String, Loan> allLoans) {
         this.allLoans = allLoans;

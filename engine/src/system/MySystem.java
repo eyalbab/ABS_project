@@ -47,10 +47,11 @@ public class MySystem {
 //        if (afterFilterCount != beforeFilterCount) {
 //            throw new AbsException("Some loans owners doesn't exit in the system");
 //        }
-        for (Loan loan : tmpAllLoans.getAllLoans().values()
-        ) {
-            if (!tmpAllCustomers.getAllCustomers().containsKey(loan.getOwner())) {
-                throw new AbsException("Loan " + loan.getId() + " owner doesn't exist");
+        for (Loan loan : tmpAllLoans.getAllLoans().values()) {
+            for (Customer customer : tmpAllCustomers.getAllCustomers()) {
+                if (!tmpAllCustomers.getCustomerByName(loan.getOwner()).isPresent()) {
+                    throw new AbsException("Loan " + loan.getId() + " owner doesn't exist");
+                }
             }
             if (!tmpAllCategories.getAllCategories().contains(loan.getCategory())) {
                 throw new AbsException("Loan " + loan.getCategory() + " category doesn't exist");
@@ -79,19 +80,40 @@ public class MySystem {
     }
 
     public String handleDeposit(String userPick, String sum) {
-        int sanitizedSum = ABSUtils.tryParseIntAndValidateRange(sum,0,Integer.MAX_VALUE);
-        if(sanitizedSum<1){
+        Integer sanitizedSum = ABSUtils.tryParseIntAndValidateRange(sum, 0, Integer.MAX_VALUE);
+        if (sanitizedSum < 1) {
             return "Invalid sum to deposit";
         }
-        ABSUtils.sanitizeStr(userPick);
-        Customer toDeposit = allCustomers.getAllCustomers().get(userPick);
-        if (toDeposit != null){
-            toDeposit.addTransaction(getYaz(),sanitizedSum,Boolean.TRUE);
-            return "Deposit was Successful";
+        Integer userPickInt = ABSUtils.tryParseIntAndValidateRange(userPick, 1, allCustomers.getAllCustomers().size());
+        if (userPickInt == -1) {
+            return "Invalid customer index";
         }
-        else{
+        Customer toDeposit = allCustomers.getAllCustomers().get(userPickInt - 1);
+        if (toDeposit != null) {
+            toDeposit.addTransaction(getYaz(), sanitizedSum, Boolean.TRUE);
+            return "Deposit was Successful";
+        } else {
             return "Couldn't find the customer you asked for";
         }
+    }
+
+    public String handleWithdraw(String userPick, String sum) {
+        Integer userPickInt = ABSUtils.tryParseIntAndValidateRange(userPick, 1, allCustomers.getAllCustomers().size());
+        if (userPickInt == -1) {
+            return "Invalid customer index";
+        }
+        Customer toWithdraw = allCustomers.getAllCustomers().get(userPickInt - 1);
+        if (toWithdraw == null) {
+            return "Couldn't find the customer you asked for";
+        }
+        Integer sanitizedSum = ABSUtils.tryParseIntAndValidateRange(sum, 0, toWithdraw.getBalance());
+        if (sanitizedSum < 1) {
+            return "Invalid sum to Withdraw";
+        } else {
+            toWithdraw.addTransaction(getYaz(), sanitizedSum, Boolean.FALSE);
+            return "Withdraw was Successful";
+        }
+
     }
 
     public Integer getYaz() {
@@ -113,4 +135,6 @@ public class MySystem {
     public Boolean getLoaded() {
         return isLoaded;
     }
+
+
 }

@@ -13,13 +13,15 @@ public class Customer implements Serializable {
     private final String name;
     private int balance;
     private List<Transaction> transactions;
-    private List<Loan> BorrowLoans;
-    private List<Loan> LendingLoans;
+    private List<Loan> borrowLoans;
+    private List<Loan> lendingLoans;
 
     public Customer(String name, int balance) {
         this.name = name;
         this.balance = balance;
         this.transactions = new ArrayList<>();
+        this.borrowLoans = new ArrayList<>();
+        this.lendingLoans = new ArrayList<>();
     }
 
     public String getName() {
@@ -44,35 +46,57 @@ public class Customer implements Serializable {
 
     @Override
     public String toString() {
-        String res = "*** " + name + " ***\n" + " Transactions:\n";
-        for (Transaction tran : transactions
+        StringBuilder res = new StringBuilder("*** " + name + " ***\n" + "Transactions:\n");
+        for (Transaction tran : transactions) {
+            res.append(tran.toString()).append("\n");
+        }
+        res.append(customerLoansToString(Boolean.TRUE));
+        res.append(customerLoansToString(Boolean.FALSE));
+        return res.toString();
+    }
+
+    public String customerLoansToString(Boolean isBorrowLoans) {
+        String res = isBorrowLoans ? "Borrow loans: \n" : "Lending loans: \n";
+        List<Loan> toIter = isBorrowLoans ? borrowLoans : lendingLoans;
+        for (Loan loan : toIter
         ) {
-            res += tran.toString() + "\n";
+            res += "name:" + loan.getId() + "\n" +
+                    "category:" + loan.getCategory() + "\n" +
+                    "capital:" + loan.getCapital() + "\n" +
+                    "rate:" + loan.getPaymentRatio() + "\n" +
+                    "interest:" + loan.getInterest() + "\n" +
+                    "total sum:" + loan.getTotalPay() + "\n";
+            switch (loan.getStatus()) {
+                case NEW:
+                    break;
+                case PENDING:
+                    res += "Left for active: " + (loan.getCapital() - loan.getRecruited()) + "\n";
+                    break;
+                case ACTIVE:
+                    res += "Next payment yaz: " + loan.getNextPaymentYaz() + ", next payment sum: "
+                            + (loan.getTotalPay() / loan.getTotalPayCount()) + "\n";
+                    break;
+                case RISK:
+                    res = loan.getRiskedPaymentInfo(res);
+                    break;
+                case FINISHED:
+                    res += "Activated yaz: " + loan.getActivatedYaz() + ", finished yaz: " +
+                            loan.getFinishedYaz() + "\n";
+                    break;
+            }
         }
-        res += "Loans as Lender:\n";
-        res += "Loans as Borrower:\n";
+
         return res;
+
     }
 
-    public String customerLoansToString(Loan loan) {
-        String res = "name:" + loan.getId() + "\n" +
-                "category:" + loan.getCategory() + "\n" +
-                "capital:" + loan.getCapital() + "\n" +
-                "rate:" + loan.getPaymentRatio() + "\n" +
-                "interest:" + loan.getInterest() + "\n" +
-                "total sum:" + loan.getTotalPay() + "\n";
-        return res;
-
-    }
-
-    public void addTransaction(int yaz,int sum,Boolean income){
-        if(income){
-            transactions.add(new Transaction(yaz,sum,Boolean.TRUE,getBalance()));
-            setBalance(getBalance()+sum);
-        }
-        else {
-            transactions.add(new Transaction(yaz,sum,Boolean.FALSE,getBalance()));
-            setBalance(getBalance()-sum);
+    public void addTransaction(int yaz, int sum, Boolean income) {
+        if (income) {
+            transactions.add(new Transaction(yaz, sum, Boolean.TRUE, getBalance()));
+            setBalance(getBalance() + sum);
+        } else {
+            transactions.add(new Transaction(yaz, sum, Boolean.FALSE, getBalance()));
+            setBalance(getBalance() - sum);
         }
     }
 }

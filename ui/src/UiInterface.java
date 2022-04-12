@@ -36,4 +36,8 @@ public interface UiInterface {
     void showCustomerInfo();
 
     void deposit();
+
+    void withdraw();
+
+    void loanAssignment();
 }

@@ -12,9 +12,9 @@ public class ABSUtils {
 
     private final static String JAXB_XML_ABS_PACKAGE = "jaxb.generated";
 
-    public static int tryParseIntAndValidateRange(String value, int min, int max) {
+    public static Integer tryParseIntAndValidateRange(String value, Integer min, Integer max) {
         try {
-            int intValue = Integer.parseInt(value);
+            Integer intValue = Integer.parseInt(value);
             if (intValue > max || intValue < min)
                 return -1;
             return intValue;
@@ -35,6 +35,13 @@ public class ABSUtils {
             res = res.toLowerCase();
             res = StringUtils.capitalize(res);
             return res;
+        } else return null;
+    }
+
+    public static Integer sanitizeStrToInt(String toSanit) {
+        if (toSanit != null) {
+            String res = toSanit.trim();
+            return Integer.valueOf(res);
         } else return null;
     }
 }

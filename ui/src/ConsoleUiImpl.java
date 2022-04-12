@@ -19,6 +19,7 @@ public class ConsoleUiImpl implements UiInterface {
 
     @Override
     public void Run() {
+        mySystem = new MySystem();
         showMenu();
     }
 
@@ -50,8 +51,11 @@ public class ConsoleUiImpl implements UiInterface {
                 break;
 
             case 2:
-                //show loans info
-                System.out.println("chose 2");
+                if (mySystem.getLoaded()) {
+                    showLoansInfo();
+                } else {
+                    System.out.println("Load A file first");
+                }
                 break;
 
             case 3:
@@ -72,7 +76,7 @@ public class ConsoleUiImpl implements UiInterface {
 
             case 5:
                 if (mySystem.getLoaded()) {
-                    //withdraw
+                    withdraw();
                 } else {
                     System.out.println("Load A file first");
                 }
@@ -80,7 +84,7 @@ public class ConsoleUiImpl implements UiInterface {
 
             case 6:
                 if (mySystem.getLoaded()) {
-                    //Loan Assign
+                    loanAssignment();
                 } else {
                     System.out.println("Load A file first");
                 }
@@ -88,7 +92,7 @@ public class ConsoleUiImpl implements UiInterface {
 
             case 7:
                 if (mySystem.getLoaded()) {
-                    //Continue timelien
+                    //Continue timeline
                 } else {
                     System.out.println("Load A file first");
                 }
@@ -129,12 +133,30 @@ public class ConsoleUiImpl implements UiInterface {
     @Override
     public void deposit() {
         System.out.println(mySystem.getAllCustomers().showAllCustomersNameByOrder());
-        System.out.println("Please enter customer name you wish to deposit to:");
+        System.out.println("Please enter customer index you wish to deposit to:");
         Scanner userInput = new Scanner(System.in);
         String userInputName = userInput.nextLine();
-        System.out.println("Enter amount to Deposit");
+        System.out.println("Enter amount to Deposit:");
         String userInputSum = userInput.nextLine();
         System.out.println(mySystem.handleDeposit(userInputName, userInputSum));
 
+    }
+
+    public void withdraw() {
+        System.out.println(mySystem.getAllCustomers().showAllCustomersNameByOrder());
+        System.out.println("Please enter customer index you wish to withdraw from:");
+        Scanner userInput = new Scanner(System.in);
+        String userInputName = userInput.nextLine();
+        System.out.println("Enter amount to withdraw:");
+        String userInputSum = userInput.nextLine();
+        System.out.println(mySystem.handleWithdraw(userInputName, userInputSum));
+    }
+
+    @Override
+    public void loanAssignment() {
+        System.out.println(mySystem.getAllCustomers().showAllCustomersNameByOrder());
+        System.out.println("Please enter customer index you wish to assign loan:");
+        Scanner userInput = new Scanner(System.in);
+        String userInputName = userInput.nextLine();
     }
 }
