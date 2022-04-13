@@ -2,11 +2,11 @@ package customer;
 
 public class Transaction {
 
-    private int yazDate;
-    private int sum;
+    private Integer yazDate;
+    private Integer sum;
     private Boolean income;
-    private int prevBalance;
-    private int afterBalance;
+    private Integer prevBalance;
+    private Integer afterBalance;
 
     public Transaction(int yazDate, int sum, Boolean income, int prevBalance) {
         this.yazDate = yazDate;

@@ -4,27 +4,43 @@ import exception.AbsException;
 import jaxb.generated.AbsCategories;
 import utils.ABSUtils;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Categories {
-    private Set<String> allCategories;
+    private final List<String> allCategories;
 
-    public Categories(Set<String> allCategories) {
+    public Categories(List<String> allCategories) {
         this.allCategories = allCategories;
     }
 
     public static Categories ConvertRawAbsToCategories(AbsCategories rawVer) throws AbsException {
-        Set<String> resSet = new HashSet<>();
-        for (String category : rawVer.getAbsCategory()
-        ) {
-            resSet.add(ABSUtils.sanitizeStr(category));
+        List<String> resList = new ArrayList<>();
+        for (String categ : rawVer.getAbsCategory()) {
+            if (!resList.isEmpty()) {
+                for (String toIter : resList) {
+                    if (toIter.equals(categ)) {
+                        throw new AbsException("We can't have two Categories with same name");
+                    }
+                }
+            }
+            resList.add(ABSUtils.sanitizeStr(categ));
         }
-        Categories res = new Categories(resSet);
-        return res;
+
+        return new Categories(resList);
     }
 
-    public Set<String> getAllCategories() {
+    public List<String> getAllCategories() {
         return allCategories;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder res = new StringBuilder("Categories are:\n");
+        int i = 0;
+        for (String categ : allCategories) {
+            res.append(++i).append(") ").append(categ).append(".\n");
+        }
+        return res.toString();
     }
 }

@@ -1,8 +1,11 @@
+import customer.Customer;
 import exception.AbsException;
+import loan.Loan;
 import system.MySystem;
 import utils.ABSUtils;
 
 import javax.xml.bind.JAXBException;
+import java.util.List;
 import java.util.Scanner;
 
 import static java.lang.System.exit;
@@ -157,6 +160,39 @@ public class ConsoleUiImpl implements UiInterface {
         System.out.println(mySystem.getAllCustomers().showAllCustomersNameByOrder());
         System.out.println("Please enter customer index you wish to assign loan:");
         Scanner userInput = new Scanner(System.in);
-        String userInputName = userInput.nextLine();
+        String customerIndex = userInput.nextLine();
+        System.out.println("Enter sum your willing to invest");
+        String sumToInvest = userInput.nextLine();
+        System.out.println(mySystem.getCategories() + "Choose categories by their index, seperated with comma (e.g 1,2,3) or press Enter for all");
+        String categoriesPick = userInput.nextLine();
+        System.out.println("Enter minimum interest percentage you wish to profit(e.g 27) or press Enter for any: ");
+        String minInterest = userInput.nextLine();
+        System.out.println("Enter minimum loan total yaz time: ");
+        String minYazTime = userInput.nextLine();
+        try {
+            List<Loan> optionalLoans = mySystem.showSuggestedLoans(customerIndex, sumToInvest, categoriesPick, minInterest, minYazTime);
+            if (optionalLoans.isEmpty()) {
+                System.out.println("There are no matching loans in system");
+                return;
+            }
+            System.out.println("The relevant loans in the system are:\n");
+            int i = 1;
+            for (Loan loan : optionalLoans) {
+                System.out.print(i++ + ". ");
+                System.out.println(Customer.loanInfoForCustomer(loan));
+            }
+            System.out.println("Please pick the wanted loan by pressing the loan index");
+            String pickedLoansString = userInput.nextLine();
+            List<Loan> pickedLoans = mySystem.handleLoansPick(pickedLoansString, optionalLoans);
+            if (pickedLoans.isEmpty()) {
+                System.out.println("Invalid loans pick");
+                return;
+            }
+            Customer assignTo = mySystem.getAllCustomers().getAllCustomers().get(Integer.parseInt(customerIndex) - 1);
+            mySystem.assignLoans(assignTo, pickedLoans, Integer.parseInt(sumToInvest));
+            System.out.println("Loans has assigned successfully");
+        } catch (AbsException e) {
+            System.out.println(e.getErrorMsg());
+        }
     }
 }

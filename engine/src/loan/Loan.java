@@ -25,6 +25,7 @@ public class Loan implements Serializable {
     private Integer activatedYaz;
     private final Integer finishedYaz;
     private Integer nextPaymentYaz;
+    private Integer nextPaymentSum;
     private List<Payment> loanPayments;
 
     public Loan(String Id, String owner, String category, Integer capital, Integer totalYaz, Integer payRate, Integer interest) {
@@ -41,6 +42,7 @@ public class Loan implements Serializable {
         this.activatedYaz = null;
         this.finishedYaz = null;
         this.nextPaymentYaz = null;
+        this.nextPaymentSum = null;
         this.loanPayments = new ArrayList<>();
     }
 
@@ -62,8 +64,7 @@ public class Loan implements Serializable {
         }
         String sanityID = ABSUtils.sanitizeStr(loan.getId());
         String sanityCategory = ABSUtils.sanitizeStr(loan.getAbsCategory());
-        Loan res = new Loan(sanityID, loan.getAbsOwner(), sanityCategory, loan.getAbsCapital(), loan.getAbsTotalYazTime(), loan.getAbsPaysEveryYaz(), loan.getAbsIntristPerPayment());
-        return res;
+        return new Loan(sanityID, loan.getAbsOwner(), sanityCategory, loan.getAbsCapital(), loan.getAbsTotalYazTime(), loan.getAbsPaysEveryYaz(), loan.getAbsIntristPerPayment());
     }
 
     public enum LoanStatus {
@@ -107,7 +108,7 @@ public class Loan implements Serializable {
     }
 
     public Integer getTotalPayCount() {
-        return totalYazTime/paymentRatio;
+        return totalYazTime / paymentRatio;
     }
 
     public Integer getRecruited() {
@@ -152,13 +153,13 @@ public class Loan implements Serializable {
 
     @Override
     public String toString() {
-        String res = "_________________________\n" +
+        String res =
                 "ID: " + getId() + "\n" +
-                "Owner: " + getOwner() + "\n" +
-                "Category: " + getCategory() + "\n" +
-                "Capital: " + getCapital() + ", Total period: " + getTotalYazTime() + " Yaz\n" +
-                "Interest: " + getInterest() + "%, Pay rate: " + getPaymentRatio() + " Yaz\n" +
-                "Status: " + getStatus() + "\n";
+                        "Owner: " + getOwner() + "\n" +
+                        "Category: " + getCategory() + "\n" +
+                        "Capital: " + getCapital() + ", Total period: " + getTotalYazTime() + " Yaz\n" +
+                        "Interest: " + getInterest() + "%, Pay rate: " + getPaymentRatio() + " Yaz\n" +
+                        "Status: " + getStatus() + "\n" + "\n";
         switch (status) {
             case NEW:
                 break;
@@ -166,10 +167,10 @@ public class Loan implements Serializable {
                 //Show all lenders and their investment, total raised sum, amount left for active
                 res += "Lenders: \n";
                 for (Map.Entry<String, Integer> entry : lenders.entrySet()) {
-                    res += entry.getKey() + " payed " + entry.getValue() + " dollars \n";
+                    res += entry.getKey() + " payed " + entry.getValue() + "\n";
                 }
-                res += "Amount that has been recruited: " + getRecruited() + " dollars\n " +
-                        "Amount that left to recruit: " + (getCapital() - getRecruited()) + "\n";
+                res += "Amount that has been recruited: " + getRecruited() + "\n" +
+                        "Amount that left to recruit: " + (getCapital() - getRecruited()) + "\n\n";
                 break;
             case ACTIVE:
                 res = getActiveInfo(res);
@@ -181,7 +182,7 @@ public class Loan implements Serializable {
             case FINISHED:
                 res += "Lenders: \n";
                 for (Map.Entry<String, Integer> entry : lenders.entrySet()) {
-                    res += entry.getKey() + " payed " + entry.getValue() + " dollars \n";
+                    res += entry.getKey() + " payed " + entry.getValue() + "\n";
                 }
                 res += "Active yaz: " + activatedYaz + ", Finished yaz: " + finishedYaz + "\n";
                 res += showPaymentInfo(Boolean.TRUE);
@@ -205,8 +206,8 @@ public class Loan implements Serializable {
     }
 
     public String getRiskedPaymentInfo(String res) {
-        Integer numOfUnpaid = 0;
-        Integer sumOfUnpaid = 0;
+        int numOfUnpaid = 0;
+        int sumOfUnpaid = 0;
         for (Payment payment : loanPayments
         ) {
             if (!payment.getPaid()) {
@@ -254,5 +255,24 @@ public class Loan implements Serializable {
             }
         }
         return res;
+    }
+
+    public Integer getNormalNextPaymentSum() {
+        return getTotalPay() / paymentRatio;
+    }
+
+    public void newInvestment(String investorName, Integer investment, Integer currentYaz) {
+        Integer alreadyInvested = lenders.getOrDefault(investorName, 0);
+        lenders.put(investorName, alreadyInvested + investment);
+        recruited += investment;
+        if (status.equals(LoanStatus.NEW)) {
+            setStatus(LoanStatus.PENDING);
+        }
+        if (recruited.equals(capital)) {
+            setStatus(LoanStatus.ACTIVE);
+            setActivatedYaz(currentYaz);
+            nextPaymentYaz = currentYaz + paymentRatio;
+            nextPaymentSum = getNormalNextPaymentSum();
+        }
     }
 }

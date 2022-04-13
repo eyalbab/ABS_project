@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public class Customers {
 
-    private List<Customer> allCustomers ;
+    private final List<Customer> allCustomers;
 
     private Customers(List<Customer> allCustomers) {
         this.allCustomers = allCustomers;
@@ -30,8 +30,7 @@ public class Customers {
             resList.add(toAdd);
         }
 
-        Customers res = new Customers(resList);
-        return res;
+        return new Customers(resList);
     }
 
     public List<Customer> getAllCustomers() {
@@ -49,21 +48,20 @@ public class Customers {
 
     @Override
     public String toString() {
-        String res = "Customers in the system:\n";
+        StringBuilder res = new StringBuilder("Customers in the system:\n");
         int i = 1;
         for (Customer cust : this.getAllCustomers()) {
-            res += i++ + ". " + cust + "\n";
+            res.append(i++).append(". ").append(cust).append("\n");
         }
-        return res;
+        return res.toString();
     }
 
     public String showAllCustomersNameByOrder() {
-        String res = "Customers in the system:\n";
+        StringBuilder res = new StringBuilder("Customers in the system:\n");
         int i = 1;
-        for (Customer cust : this.getAllCustomers()
-        ) {
-            res += i++ + ". " + cust.getName() + " Balance - " + cust.getBalance() + "\n";
+        for (Customer cust : this.getAllCustomers()) {
+            res.append(i++).append(". ").append(cust.getName()).append(" Balance - ").append(cust.getBalance()).append("\n");
         }
-        return res;
+        return res.toString();
     }
 }

@@ -4,43 +4,44 @@ import exception.AbsException;
 import jaxb.generated.AbsLoan;
 import jaxb.generated.AbsLoans;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Loans {
-    private Map<String, Loan> allLoans;
+    private final List<Loan> allLoans;
 
-    private Loans(Map<String, Loan> allLoans) {
+    private Loans(List<Loan> allLoans) {
         this.allLoans = allLoans;
     }
 
     public static Loans ConvertRawAbsToLoans(AbsLoans rawVer) throws AbsException {
-        Map<String, Loan> resMap = new HashMap<>();
-        for (AbsLoan loan : rawVer.getAbsLoan()
-        ) {
+        List<Loan> resList = new ArrayList<>();
+        for (AbsLoan loan : rawVer.getAbsLoan()) {
             Loan toAdd = Loan.ConvertRawAbsToLoan(loan);
-            if (resMap.containsKey(toAdd.getId())) {
-                throw new AbsException("We can't have two loans with same ID");
-            } else {
-                resMap.put(toAdd.getId(), toAdd);
+            if (!resList.isEmpty()) {
+                for (Loan loanTmp : resList) {
+                    if (loanTmp.getId().equals(toAdd.getId())) {
+                        throw new AbsException("We can't have two loans with same ID");
+                    }
+                }
             }
+            resList.add(toAdd);
         }
-        Loans res = new Loans(resMap);
-        return res;
+        return new Loans(resList);
     }
 
-    public Map<String, Loan> getAllLoans() {
+    public List<Loan> getAllLoans() {
         return allLoans;
     }
 
 
     @Override
     public String toString() {
-        String res = "Loans in the system:\n";
-        for (Loan loan : this.getAllLoans().values()
-        ) {
-            res += loan;
+        StringBuilder res = new StringBuilder("Loans in the system:\n----------------------\n");
+        int i = 1;
+        for (Loan loan : this.getAllLoans()) {
+            res.append(i++).append(". ").append(loan);
         }
-        return res;
+        return res.toString();
     }
 }

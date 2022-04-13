@@ -56,38 +56,43 @@ public class Customer implements Serializable {
     }
 
     public String customerLoansToString(Boolean isBorrowLoans) {
-        String res = isBorrowLoans ? "Borrow loans: \n" : "Lending loans: \n";
+        StringBuilder res = new StringBuilder(isBorrowLoans ? "Borrow loans: \n" : "Lending loans: \n");
         List<Loan> toIter = isBorrowLoans ? borrowLoans : lendingLoans;
-        for (Loan loan : toIter
-        ) {
-            res += "name:" + loan.getId() + "\n" +
-                    "category:" + loan.getCategory() + "\n" +
-                    "capital:" + loan.getCapital() + "\n" +
-                    "rate:" + loan.getPaymentRatio() + "\n" +
-                    "interest:" + loan.getInterest() + "\n" +
-                    "total sum:" + loan.getTotalPay() + "\n";
-            switch (loan.getStatus()) {
-                case NEW:
-                    break;
-                case PENDING:
-                    res += "Left for active: " + (loan.getCapital() - loan.getRecruited()) + "\n";
-                    break;
-                case ACTIVE:
-                    res += "Next payment yaz: " + loan.getNextPaymentYaz() + ", next payment sum: "
-                            + (loan.getTotalPay() / loan.getTotalPayCount()) + "\n";
-                    break;
-                case RISK:
-                    res = loan.getRiskedPaymentInfo(res);
-                    break;
-                case FINISHED:
-                    res += "Activated yaz: " + loan.getActivatedYaz() + ", finished yaz: " +
-                            loan.getFinishedYaz() + "\n";
-                    break;
-            }
+        for (Loan loan : toIter) {
+            res.append(loanInfoForCustomer(loan));
         }
 
-        return res;
+        return res.toString();
 
+    }
+
+    public static String loanInfoForCustomer(Loan loan) {
+        String res =
+                "name:" + loan.getId() + "\n" +
+                        "category:" + loan.getCategory() + "\n" +
+                        "capital:" + loan.getCapital() + "\n" +
+                        "rate:" + loan.getPaymentRatio() + "\n" +
+                        "interest:" + loan.getInterest() + "\n" +
+                        "total sum:" + loan.getTotalPay() + "\n";
+        switch (loan.getStatus()) {
+            case NEW:
+                break;
+            case PENDING:
+                res += "Left for active: " + (loan.getCapital() - loan.getRecruited()) + "\n";
+                break;
+            case ACTIVE:
+                res += "Next payment yaz: " + loan.getNextPaymentYaz() + ", next payment sum: "
+                        + (loan.getTotalPay() / loan.getTotalPayCount()) + "\n";
+                break;
+            case RISK:
+                res = loan.getRiskedPaymentInfo(res);
+                break;
+            case FINISHED:
+                res += "Activated yaz: " + loan.getActivatedYaz() + ", finished yaz: " +
+                        loan.getFinishedYaz() + "\n";
+                break;
+        }
+        return res;
     }
 
     public void addTransaction(int yaz, int sum, Boolean income) {
@@ -98,5 +103,11 @@ public class Customer implements Serializable {
             transactions.add(new Transaction(yaz, sum, Boolean.FALSE, getBalance()));
             setBalance(getBalance() - sum);
         }
+    }
+
+    public void addNewLending(Loan addToLending, Integer investment, Integer currentYaz) {
+        transactions.add(new Transaction(currentYaz, investment, false, balance));
+        setBalance(balance - investment);
+        lendingLoans.add(addToLending);
     }
 }
