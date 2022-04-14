@@ -23,6 +23,17 @@ public class ABSUtils {
         }
     }
 
+    public static Double tryParseDoubleAndValidateRange(String value, Double min, Double max) {
+        try {
+            Double DoubleValue = Double.parseDouble(value);
+            if (DoubleValue > max || DoubleValue < min)
+                return -1.0;
+            return DoubleValue;
+        } catch (NumberFormatException e) {
+            return -1.0;
+        }
+    }
+
     public static AbsDescriptor deserializeFrom(InputStream in) throws JAXBException {
         JAXBContext jc = JAXBContext.newInstance(JAXB_XML_ABS_PACKAGE);
         Unmarshaller u = jc.createUnmarshaller();

@@ -3,12 +3,12 @@ package customer;
 public class Transaction {
 
     private Integer yazDate;
-    private Integer sum;
+    private Double sum;
     private Boolean income;
-    private Integer prevBalance;
-    private Integer afterBalance;
+    private Double prevBalance;
+    private Double afterBalance;
 
-    public Transaction(int yazDate, int sum, Boolean income, int prevBalance) {
+    public Transaction(int yazDate, Double sum, Boolean income, Double prevBalance) {
         this.yazDate = yazDate;
         this.sum = sum;
         this.income = income;

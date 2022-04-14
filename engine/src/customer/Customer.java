@@ -6,17 +6,17 @@ import loan.Loan;
 import utils.ABSUtils;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Customer implements Serializable {
     private final String name;
-    private int balance;
+    private Double balance;
     private List<Transaction> transactions;
     private List<Loan> borrowLoans;
     private List<Loan> lendingLoans;
 
-    public Customer(String name, int balance) {
+    public Customer(String name, Double balance) {
         this.name = name;
         this.balance = balance;
         this.transactions = new ArrayList<>();
@@ -28,18 +28,18 @@ public class Customer implements Serializable {
         return name;
     }
 
-    public int getBalance() {
+    public Double getBalance() {
         return balance;
     }
 
-    public void setBalance(int balance) {
+    public void setBalance(Double balance) {
         this.balance = balance;
     }
 
     public static Customer convertRawAbsToCustomer(AbsCustomer cust) throws AbsException {
         String custName = ABSUtils.sanitizeStr(cust.getName());
         if (cust.getAbsBalance() > 0) {
-            return new Customer(custName, cust.getAbsBalance());
+            return new Customer(custName, (double) cust.getAbsBalance());
         } else
             throw new AbsException("the Customer " + custName + " has negative balance, it's invalid");
     }
@@ -95,7 +95,7 @@ public class Customer implements Serializable {
         return res;
     }
 
-    public void addTransaction(int yaz, int sum, Boolean income) {
+    public void addTransaction(int yaz, Double sum, Boolean income) {
         if (income) {
             transactions.add(new Transaction(yaz, sum, Boolean.TRUE, getBalance()));
             setBalance(getBalance() + sum);
@@ -106,8 +106,46 @@ public class Customer implements Serializable {
     }
 
     public void addNewLending(Loan addToLending, Integer investment, Integer currentYaz) {
-        transactions.add(new Transaction(currentYaz, investment, false, balance));
+        transactions.add(new Transaction(currentYaz, (double) investment, false, balance));
         setBalance(balance - investment);
         lendingLoans.add(addToLending);
+    }
+
+    public void addNewBorrowing(Loan toAdd) {
+        borrowLoans.add(toAdd);
+    }
+
+    public Map<Loan, Double> handleContinue(Integer yaz) {
+        Map<Loan, Double> isPaid = new HashMap<>();
+        List<Loan.LoanStatus> activatedStatuses = Arrays.asList(Loan.LoanStatus.ACTIVE, Loan.LoanStatus.RISK);
+        List<Loan> activatedSortedLoans = borrowLoans.stream()
+                .filter(loan -> activatedStatuses.contains(loan.getStatus()))
+                .filter(loan -> loan.getNextPaymentYaz() == yaz)
+                .sorted(Loan::compareTo)
+                .collect(Collectors.toList());
+        for (Loan loan : activatedSortedLoans) {
+            if (loan.getNextPaymentSum() <= balance) {                 //Case of still ACTIVE
+                addTransaction(yaz, loan.getNextPaymentSum(), false);
+                loan.handlePayment(loan.getNextCapitalPaymentSum(), loan.getNextInterestPaymentSum(), yaz, true);
+                isPaid.put(loan, loan.getNextPaymentSum());
+                if (loan.getTotalPaid() >= loan.getTotalPay()) {           //Case of FINISHED
+                    loan.setStatus(Loan.LoanStatus.FINISHED);
+                    loan.setFinishedYaz(yaz);
+                } else {
+                    loan.setStatus(Loan.LoanStatus.ACTIVE);            //case it was RISK and became ACTIVE again
+                    loan.setNextCapitalPaymentSum(loan.getNormalNextCapitalPaySum());
+                    loan.setNextInterestPaymentSum(loan.getNormalNextInterestPaySum());
+                    loan.setNextPaymentSum(loan.getNextPaymentSum());
+                }
+            } else {                                                  //Case of becoming RISK
+                loan.handlePayment(loan.getNextCapitalPaymentSum(), loan.getNextInterestPaymentSum(), yaz, false);
+                loan.setStatus(Loan.LoanStatus.RISK);
+                loan.setNextCapitalPaymentSum(loan.getNextCapitalPaymentSum() + loan.getNormalNextCapitalPaySum());
+                loan.setNextInterestPaymentSum(loan.getNextInterestPaymentSum() + loan.getNormalNextInterestPaySum());
+                loan.setNextPaymentSum(loan.getNextPaymentSum());
+            }
+            loan.setNextPaymentYaz(loan.getNextPaymentYaz() + loan.getPaymentRatio());
+        }
+        return isPaid;
     }
 }

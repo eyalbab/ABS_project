@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 public class MySystem {
 
-    private final Integer yaz = 1;
+    private Integer yaz = 1;
     private Categories categories;
     private Loans loans;
     private Customers allCustomers;
@@ -47,6 +47,7 @@ public class MySystem {
             if (!tmpAllCategories.getAllCategories().contains(loan.getCategory())) {
                 throw new AbsException("Loan " + loan.getCategory() + " category doesn't exist");
             }
+            tmpAllCustomers.getCustomerByName(loan.getOwner()).get().addNewBorrowing(loan);
         }
         return new MySystem(tmpAllCategories, tmpAllLoans, tmpAllCustomers);
     }
@@ -66,7 +67,7 @@ public class MySystem {
     }
 
     public String handleDeposit(String userPick, String sum) {
-        Integer sanitizedSum = ABSUtils.tryParseIntAndValidateRange(sum, 0, Integer.MAX_VALUE);
+        Double sanitizedSum = (double) ABSUtils.tryParseIntAndValidateRange(sum, 0, Integer.MAX_VALUE);
         if (sanitizedSum < 1) {
             return "Invalid sum to deposit";
         }
@@ -92,7 +93,7 @@ public class MySystem {
         if (toWithdraw == null) {
             return "Couldn't find the customer you asked for";
         }
-        Integer sanitizedSum = ABSUtils.tryParseIntAndValidateRange(sum, 0, toWithdraw.getBalance());
+        Double sanitizedSum = ABSUtils.tryParseDoubleAndValidateRange(sum, 0.0, toWithdraw.getBalance());
         if (sanitizedSum < 1) {
             return "Invalid sum to Withdraw";
         } else {
@@ -129,10 +130,9 @@ public class MySystem {
                 ABSUtils.tryParseIntAndValidateRange(customerIndex, 1, allCustomers.getAllCustomers().size());
         if (customerIndexInt == -1) {
             throw new AbsException("invalid customer pick");
-            //res += "Invalid customer index pick\n";
         } else {
-            if (!sumToInvest.equals("") && ABSUtils.tryParseIntAndValidateRange
-                    (sumToInvest, 1, allCustomers.getAllCustomers().get(customerIndexInt - 1).getBalance()) == -1) {
+            if (!sumToInvest.equals("") && ABSUtils.tryParseDoubleAndValidateRange
+                    (sumToInvest, 1.0, allCustomers.getAllCustomers().get(customerIndexInt - 1).getBalance()) == -1.0) {
                 throw new AbsException("invalid investment sum");
             }
         }
@@ -275,5 +275,21 @@ public class MySystem {
             }
         }
         return minIndex;
+    }
+
+    public void continueTimeline() {
+        yaz++;
+        for (Customer customer : allCustomers.getAllCustomers()) {
+            Map<Loan, Double> loansThatPaid = customer.handleContinue(yaz);    //returns all loans that customer could pay
+            for (Loan loan : loansThatPaid.keySet()) {
+                Set<String> lendersToPay = loan.getLenders().keySet();
+                for (String customerName : lendersToPay) {
+                    Double percentToPay = loan.getLoanPercentForEachLender().get(customerName);
+                    allCustomers.getCustomerByName(customerName).get()
+                            .addTransaction(yaz, (percentToPay * loansThatPaid.get(loan)) / 100.0, true);
+                }
+            }
+        }
+
     }
 }

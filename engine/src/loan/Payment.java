@@ -3,11 +3,11 @@ package loan;
 public class Payment {
 
     private final Integer yazOfPay;
-    private final Integer capital;
-    private final Integer interest;
+    private final Double capital;
+    private final Double interest;
     private final Boolean paid;
 
-    public Payment(Integer yazOfPay, Integer capital, Integer interest, Boolean paid) {
+    public Payment(Integer yazOfPay, Double capital, Double interest, Boolean paid) {
         this.yazOfPay = yazOfPay;
         this.capital = capital;
         this.interest = interest;
@@ -18,11 +18,11 @@ public class Payment {
         return yazOfPay;
     }
 
-    public Integer getCapital() {
+    public Double getCapital() {
         return capital;
     }
 
-    public Integer getInterest() {
+    public Double getInterest() {
         return interest;
     }
 

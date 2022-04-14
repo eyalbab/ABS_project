@@ -40,4 +40,6 @@ public interface UiInterface {
     void withdraw();
 
     void loanAssignment();
+
+    void continueTimeline();
 }

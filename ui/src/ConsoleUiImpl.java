@@ -95,7 +95,7 @@ public class ConsoleUiImpl implements UiInterface {
 
             case 7:
                 if (mySystem.getLoaded()) {
-                    //Continue timeline
+                    continueTimeline();
                 } else {
                     System.out.println("Load A file first");
                 }
@@ -194,5 +194,12 @@ public class ConsoleUiImpl implements UiInterface {
         } catch (AbsException e) {
             System.out.println(e.getErrorMsg());
         }
+    }
+
+    @Override
+    public void continueTimeline() {
+        System.out.print("Previous yaz is: " + mySystem.getYaz());
+        mySystem.continueTimeline();
+        System.out.println(", Current yaz is: " + mySystem.getYaz());
     }
 }
