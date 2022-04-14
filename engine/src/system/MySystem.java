@@ -10,14 +10,13 @@ import loan.Loans;
 import utils.ABSUtils;
 
 import javax.xml.bind.JAXBException;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class MySystem {
+public class MySystem implements Serializable {
 
+    private static final String JAXB_MY_SYSTEM_PACKAGE = "system";
     private Integer yaz = 1;
     private Categories categories;
     private Loans loans;
@@ -291,5 +290,31 @@ public class MySystem {
             }
         }
 
+    }
+
+    public String saveToDatFile(String askedPath) {
+        askedPath += ".dat";
+        try {
+            FileOutputStream file = new FileOutputStream(askedPath);
+            ObjectOutputStream out =new ObjectOutputStream(file);
+            out.writeObject(this);
+        } catch (IOException e) {
+            return "something went wrong with file";
+        }
+        return "File created successfully";
+    }
+
+    public MySystem loadFromDatFile(String askedPath) {
+        MySystem res;
+        try {
+            FileInputStream file = new FileInputStream(askedPath);
+            ObjectInputStream in = new ObjectInputStream(file);
+            res = (MySystem) in.readObject();
+        }catch (IOException e){
+            return null;
+        } catch (ClassNotFoundException e) {
+            return null;
+        }
+        return res;
     }
 }

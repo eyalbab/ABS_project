@@ -49,10 +49,4 @@ public class ABSUtils {
         } else return null;
     }
 
-    public static Integer sanitizeStrToInt(String toSanit) {
-        if (toSanit != null) {
-            String res = toSanit.trim();
-            return Integer.valueOf(res);
-        } else return null;
-    }
 }

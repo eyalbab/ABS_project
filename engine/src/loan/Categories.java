@@ -4,10 +4,11 @@ import exception.AbsException;
 import jaxb.generated.AbsCategories;
 import utils.ABSUtils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Categories {
+public class Categories implements Serializable {
     private final List<String> allCategories;
 
     public Categories(List<String> allCategories) {

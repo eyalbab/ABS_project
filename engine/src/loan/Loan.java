@@ -23,8 +23,6 @@ public class Loan implements Serializable, Comparable {
     private final String owner;
     private final String Id;
     private Integer activatedYaz;
-
-
     private Integer finishedYaz;
     private Integer nextPaymentYaz;
     private Double nextPaymentSum;
@@ -122,10 +120,6 @@ public class Loan implements Serializable, Comparable {
         return recruited;
     }
 
-    public void setRecruited(Integer recruited) {
-        this.recruited = recruited;
-    }
-
     public void setActivatedYaz(Integer activatedYaz) {
         this.activatedYaz = activatedYaz;
     }
@@ -146,16 +140,8 @@ public class Loan implements Serializable, Comparable {
         return finishedYaz;
     }
 
-    public List<Payment> getLoanPayments() {
-        return loanPayments;
-    }
-
     public Map<String, Double> getLoanPercentForEachLender() {
         return loanPercentForEachLender;
-    }
-
-    public void setLoanPercentForEachLender(Map<String, Double> loanPercentForEachLender) {
-        this.loanPercentForEachLender = loanPercentForEachLender;
     }
 
     public Double getTotalPay() {

@@ -1,6 +1,8 @@
 package loan;
 
-public class Payment {
+import java.io.Serializable;
+
+public class Payment implements Serializable {
 
     private final Integer yazOfPay;
     private final Double capital;

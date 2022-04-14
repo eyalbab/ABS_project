@@ -4,11 +4,12 @@ import exception.AbsException;
 import jaxb.generated.AbsCustomer;
 import jaxb.generated.AbsCustomers;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class Customers {
+public class Customers implements Serializable {
 
     private final List<Customer> allCustomers;
 

@@ -35,18 +35,20 @@ public class ConsoleUiImpl implements UiInterface {
                 "5) Withdraw from account.%n" +
                 "6) Loan assignment.%n" +
                 "7) Continue timeline%n" +
-                "8) Exit program.%n");
+                "8) Exit program.%n" +
+                "9) Save to DAT file.%n" +
+                "10) Load from DAT file.%n");
         System.out.println(menu);
-        System.out.println("Enter number between 1-8:");
+        System.out.println("Enter number between 1-10:");
         handleUserMenuInput();
     }
 
     private void handleUserMenuInput() {
         Scanner userInput = new Scanner(System.in);
-        int menuPick = ABSUtils.tryParseIntAndValidateRange(userInput.nextLine(), 1, 8);
-        while (menuPick > 8 || menuPick < 1) {
-            System.out.println("invalid argument, please enter number between 1-8");
-            menuPick = ABSUtils.tryParseIntAndValidateRange(userInput.nextLine(), 1, 8);
+        int menuPick = ABSUtils.tryParseIntAndValidateRange(userInput.nextLine(), 1, 10);
+        while (menuPick > 10 || menuPick < 1) {
+            System.out.println("invalid argument, please enter number between 1-10");
+            menuPick = ABSUtils.tryParseIntAndValidateRange(userInput.nextLine(), 1, 10);
         }
         switch (menuPick) {
             case 1:
@@ -102,6 +104,16 @@ public class ConsoleUiImpl implements UiInterface {
                 break;
             case 8:
                 exit(0);
+                break;
+            case 9:
+                if (mySystem.getLoaded()) {
+                    saveToDatFile();
+                } else {
+                    System.out.println("Load A file first");
+                }
+                break;
+            case 10:
+                loadFromDatFile();
                 break;
 
         }
@@ -201,5 +213,27 @@ public class ConsoleUiImpl implements UiInterface {
         System.out.print("Previous yaz is: " + mySystem.getYaz());
         mySystem.continueTimeline();
         System.out.println(", Current yaz is: " + mySystem.getYaz());
+    }
+
+    @Override
+    public void saveToDatFile() {
+        System.out.println("Enter new dat file path: ");
+        Scanner userInput = new Scanner(System.in);
+        String askedPath = userInput.nextLine();
+        System.out.println(mySystem.saveToDatFile(askedPath));
+    }
+
+    @Override
+    public void loadFromDatFile() {
+        System.out.println("Enter dat file path to load: ");
+        Scanner userInput = new Scanner(System.in);
+        String askedPath = userInput.nextLine();
+        MySystem createdSys = mySystem.loadFromDatFile(askedPath);
+        if (createdSys == null) {
+            System.out.println("Load was NOT successful");
+        } else {
+            mySystem = createdSys;
+            System.out.println("Load was successful");
+        }
     }
 }

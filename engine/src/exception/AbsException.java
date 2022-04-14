@@ -1,7 +1,7 @@
 package exception;
 
 public class AbsException extends Exception {
-    private String errorMsg;
+    private final String errorMsg;
 
     public AbsException(String error) {
         super(error);

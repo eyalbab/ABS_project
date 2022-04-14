@@ -4,10 +4,11 @@ import exception.AbsException;
 import jaxb.generated.AbsLoan;
 import jaxb.generated.AbsLoans;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Loans {
+public class Loans implements Serializable {
     private final List<Loan> allLoans;
 
     private Loans(List<Loan> allLoans) {

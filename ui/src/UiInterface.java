@@ -42,4 +42,8 @@ public interface UiInterface {
     void loanAssignment();
 
     void continueTimeline();
+
+    void saveToDatFile();
+
+    void loadFromDatFile();
 }
