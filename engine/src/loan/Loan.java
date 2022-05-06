@@ -177,7 +177,9 @@ public class Loan implements Serializable, Comparable {
         this.status = status;
     }
 
-    public void setFinishedYaz(Integer finishedYaz) {this.finishedYaz = finishedYaz;}
+    public void setFinishedYaz(Integer finishedYaz) {
+        this.finishedYaz = finishedYaz;
+    }
 
     @Override
     public String toString() {
@@ -292,6 +294,7 @@ public class Loan implements Serializable, Comparable {
                 res += payment.toString();
             }
         }
+        res += "\n";
         return res;
     }
 

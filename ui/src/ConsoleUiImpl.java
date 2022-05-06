@@ -193,10 +193,10 @@ public class ConsoleUiImpl implements UiInterface {
                 System.out.print(i++ + ". ");
                 System.out.println(Customer.loanInfoForCustomer(loan));
             }
-            System.out.println("Please pick the wanted loan by pressing the loan index");
+            System.out.println("Choose loans by their index, seperated with comma (e.g 1,2,3)");
             String pickedLoansString = userInput.nextLine();
             List<Loan> pickedLoans = mySystem.handleLoansPick(pickedLoansString, optionalLoans);
-            if (pickedLoans.isEmpty()) {
+            if (pickedLoans == null) {
                 System.out.println("Invalid loans pick");
                 return;
             }

@@ -69,6 +69,7 @@ public class Customer implements Serializable {
     public static String loanInfoForCustomer(Loan loan) {
         String res =
                 "name:" + loan.getId() + "\n" +
+                        "status:" + loan.getStatus() + "\n" +
                         "category:" + loan.getCategory() + "\n" +
                         "capital:" + loan.getCapital() + "\n" +
                         "rate:" + loan.getPaymentRatio() + "\n" +
@@ -92,6 +93,7 @@ public class Customer implements Serializable {
                         loan.getFinishedYaz() + "\n";
                 break;
         }
+        res += "\n";
         return res;
     }
 
@@ -140,9 +142,11 @@ public class Customer implements Serializable {
             } else {                                                  //Case of becoming RISK
                 loan.handlePayment(loan.getNextCapitalPaymentSum(), loan.getNextInterestPaymentSum(), yaz, false);
                 loan.setStatus(Loan.LoanStatus.RISK);
-                loan.setNextCapitalPaymentSum(loan.getNextCapitalPaymentSum() + loan.getNormalNextCapitalPaySum());
-                loan.setNextInterestPaymentSum(loan.getNextInterestPaymentSum() + loan.getNormalNextInterestPaySum());
-                loan.setNextPaymentSum(loan.getNextPaymentSum());
+                if (loan.getActivatedYaz() + loan.getTotalYazTime() > yaz) {
+                    loan.setNextCapitalPaymentSum(loan.getNextCapitalPaymentSum() + loan.getNormalNextCapitalPaySum());
+                    loan.setNextInterestPaymentSum(loan.getNextInterestPaymentSum() + loan.getNormalNextInterestPaySum());
+                    loan.setNextPaymentSum(loan.getNextPaymentSum());
+                }
             }
             loan.setNextPaymentYaz(loan.getNextPaymentYaz() + loan.getPaymentRatio());
         }
